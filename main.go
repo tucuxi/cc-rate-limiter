@@ -8,7 +8,7 @@ import (
 	"github.com/tucuxi/cc-rate-limiter/internal/ratelimit"
 )
 
-var limiter = ratelimit.NewFixedWindowLimiter(60)
+var limiter = ratelimit.NewFixedWindowLimiter(60, 60)
 
 func main() {
 	http.HandleFunc("/limited", limitedHandler)

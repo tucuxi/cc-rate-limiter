@@ -7,25 +7,25 @@ import (
 
 type FixedWindowLimiter struct {
 	mu       sync.Mutex
+	size     int
 	capacity int
 	current  int
 	window   int64
 }
 
-const WINDOW_SIZE = 60000 /* ms */
-
-func NewFixedWindowLimiter(rate int) Limiter {
+func NewFixedWindowLimiter(size, capacity int) Limiter {
 	return &FixedWindowLimiter{
-		capacity: rate,
+		size:     size,
+		capacity: capacity,
 		current:  0,
-		window:   time.Now().UnixMilli() / WINDOW_SIZE,
+		window:   time.Now().UnixMilli() / 1000 / int64(size),
 	}
 }
 
 func (l *FixedWindowLimiter) Take() bool {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	w := time.Now().UnixMilli() / WINDOW_SIZE
+	w := time.Now().UnixMilli() / 1000 / int64(l.size)
 	if w > l.window {
 		l.window = w
 		l.current = 0
