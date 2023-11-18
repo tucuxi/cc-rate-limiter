@@ -6,41 +6,41 @@ import (
 )
 
 type BucketLimiter struct {
-	mu       sync.Mutex
-	capacity int
-	rate     int
-	current  int
-	updated  time.Time
+	mu      sync.Mutex
+	rate    Rate
+	current int
+	updated time.Time
 }
 
-func NewBucketLimiter(capacity int, rate int) Limiter {
+func NewBucketLimiter(rate Rate) Limiter {
 	return &BucketLimiter{
-		capacity: capacity,
-		rate:     rate,
-		current:  capacity,
-		updated:  time.Now(),
+		rate:    rate,
+		current: rate.N,
+		updated: time.Now(),
 	}
 }
 
 func (l *BucketLimiter) Take() bool {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	l.refill()
-	if l.current == 0 {
-		return false
-	}
-	l.current--
-	return true
-}
 
-func (l *BucketLimiter) refill() {
 	now := time.Now()
-	fill := int(now.Sub(l.updated).Seconds() * float64(l.rate))
+	fill := int(int64(l.rate.N) * now.Sub(l.updated).Milliseconds() / l.rate.D.Milliseconds())
 	if fill > 0 {
 		l.updated = now
-		l.current += fill
-		if l.current > l.capacity {
-			l.current = l.capacity
-		}
+		l.current = min(l.current+fill, l.rate.N)
 	}
+
+	take := l.current > 0
+	if take {
+		l.current--
+	}
+	return take
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }

@@ -8,22 +8,23 @@ import (
 	"github.com/tucuxi/cc-rate-limiter/internal/ratelimit"
 )
 
-var limiter = ratelimit.NewFixedWindowLimiter(60, 60)
-
 func main() {
-	http.HandleFunc("/limited", limitedHandler)
+	var limiter = ratelimit.NewBucketLimiter(ratelimit.PerSecond(5))
+	http.HandleFunc("/limited", limit(unlimitedHandler, limiter))
 	http.HandleFunc("/unlimited", unlimitedHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func limitedHandler(w http.ResponseWriter, r *http.Request) {
-	if !limiter.Take() {
-		w.WriteHeader(http.StatusTooManyRequests)
-		return
+func limit(handler http.HandlerFunc, limiter ratelimit.Limiter) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if limiter.Take() {
+			handler(w, r)
+		} else {
+			w.WriteHeader(http.StatusTooManyRequests)
+		}
 	}
-	fmt.Fprintln(w, "Limited")
 }
 
 func unlimitedHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "No limits!")
+	fmt.Fprintln(w, "Done")
 }
