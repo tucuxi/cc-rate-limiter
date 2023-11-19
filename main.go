@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/tucuxi/cc-rate-limiter/internal/ratelimit"
+	"github.com/tucuxi/cc-rate-limiter/internal/pkg/ratelimit"
 )
 
 func main() {
