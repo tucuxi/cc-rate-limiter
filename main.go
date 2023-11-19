@@ -9,7 +9,8 @@ import (
 )
 
 func main() {
-	var limiter = ratelimit.NewSlidingWindowLogLimiter(ratelimit.PerSecond(5))
+	var limiter = ratelimit.NewSlidingWindowLimiter(ratelimit.PerSecond(5))
+
 	http.HandleFunc("/limited", limit(unlimitedHandler, limiter))
 	http.HandleFunc("/unlimited", unlimitedHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
