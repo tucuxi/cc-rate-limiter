@@ -1,16 +1,18 @@
 package ratelimit
 
 import (
+	"math"
 	"sync"
 	"time"
 )
 
 type SlidingWindowLimiter struct {
-	mu    sync.Mutex
-	rate  Rate
-	index int
-	w     [2]int64
-	n     [2]int
+	mu   sync.Mutex
+	rate Rate
+	wp   int64
+	np   int
+	w    int64
+	n    int
 }
 
 func NewSlidingWindowLimiter(rate Rate) Limiter {
@@ -27,24 +29,23 @@ func (l *SlidingWindowLimiter) Take() bool {
 	d := l.rate.D.Milliseconds()
 	w := now / d
 
-	if w > l.w[l.index] {
-		l.index = 1 - l.index
-		l.w[l.index] = w
-		l.n[l.index] = 0
+	if w > l.w {
+		if l.wp+1 == w {
+			l.np = l.n
+		} else {
+			l.np = 0
+		}
+		l.wp = w - 1
+		l.w = w
+		l.n = 0
 	}
 
-	var n int
-
-	if l.w[1-l.index] == w-1 {
-		p := float64(now-w*d) / float64(d)
-		n = int((1-p)*float64(l.n[1-l.index]) + p*float64(l.n[l.index]))
-	} else {
-		n = l.n[l.index]
-	}
+	p := 1 - float64(now-w*d)/float64(d)
+	n := l.n + int(math.Round(p*float64(l.np)))
 
 	take := n < l.rate.N
 	if take {
-		l.n[l.index]++
+		l.n++
 	}
 	return take
 }
