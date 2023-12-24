@@ -13,7 +13,7 @@ type SlidingWindowLogLimiter struct {
 }
 
 // NewSlidingWindowLogLimiter returns a new SlidingWindowLogLimiter with the given rate.
-func NewSlidingWindowLogLimiter(rate Rate) Limiter {
+func NewSlidingWindowLogLimiter(rate Rate) *SlidingWindowLogLimiter {
 	return &SlidingWindowLogLimiter{
 		rate: rate,
 	}

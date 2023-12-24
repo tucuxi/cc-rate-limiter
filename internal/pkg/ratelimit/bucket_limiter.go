@@ -14,7 +14,7 @@ type BucketLimiter struct {
 }
 
 // NewBucketLimiter returns a new BucketLimiter with the given rate.
-func NewBucketLimiter(rate Rate) Limiter {
+func NewBucketLimiter(rate Rate) *BucketLimiter {
 	return &BucketLimiter{
 		rate:    rate,
 		current: rate.N,

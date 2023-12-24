@@ -14,7 +14,7 @@ type FixedWindowLimiter struct {
 }
 
 // NewFixedWindowLimiter returns a new FixedWindowLimiter with the given rate.
-func NewFixedWindowLimiter(rate Rate) Limiter {
+func NewFixedWindowLimiter(rate Rate) *FixedWindowLimiter {
 	return &FixedWindowLimiter{
 		rate:   rate,
 		window: time.Now().UnixMilli() / rate.D.Milliseconds(),

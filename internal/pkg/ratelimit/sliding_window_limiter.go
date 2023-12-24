@@ -17,7 +17,7 @@ type SlidingWindowLimiter struct {
 }
 
 // NewSlidingWindowLimiter returns a new SlidingWindowLimiter with the given rate.
-func NewSlidingWindowLimiter(rate Rate) Limiter {
+func NewSlidingWindowLimiter(rate Rate) *SlidingWindowLimiter {
 	return &SlidingWindowLimiter{
 		rate: rate,
 	}
