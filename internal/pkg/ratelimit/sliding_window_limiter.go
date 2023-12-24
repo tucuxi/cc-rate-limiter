@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// SlidingWindowLimiter is a rate limiter based on the sliding window algorithm.
 type SlidingWindowLimiter struct {
 	mu   sync.Mutex
 	rate Rate
@@ -15,12 +16,14 @@ type SlidingWindowLimiter struct {
 	n    int
 }
 
+// NewSlidingWindowLimiter returns a new SlidingWindowLimiter with the given rate.
 func NewSlidingWindowLimiter(rate Rate) Limiter {
 	return &SlidingWindowLimiter{
 		rate: rate,
 	}
 }
 
+// Take returns true as long as the request rate remains within the allowed limit.
 func (l *SlidingWindowLimiter) Take() bool {
 	l.mu.Lock()
 	defer l.mu.Unlock()

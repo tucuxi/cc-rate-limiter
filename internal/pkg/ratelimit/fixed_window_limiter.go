@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// FixedWindowLimiter is a rate limiter based on the fixed window algorithm.
 type FixedWindowLimiter struct {
 	mu      sync.Mutex
 	rate    Rate
@@ -12,6 +13,7 @@ type FixedWindowLimiter struct {
 	window  int64
 }
 
+// NewFixedWindowLimiter returns a new FixedWindowLimiter with the given rate.
 func NewFixedWindowLimiter(rate Rate) Limiter {
 	return &FixedWindowLimiter{
 		rate:   rate,
@@ -19,6 +21,7 @@ func NewFixedWindowLimiter(rate Rate) Limiter {
 	}
 }
 
+// Take returns true as long as the request rate remains within the allowed limit.
 func (l *FixedWindowLimiter) Take() bool {
 	l.mu.Lock()
 	defer l.mu.Unlock()

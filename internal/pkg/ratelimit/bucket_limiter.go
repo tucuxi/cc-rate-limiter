@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// BucketLimiter is a rate limiter based on the token bucket algorithm.
 type BucketLimiter struct {
 	mu      sync.Mutex
 	rate    Rate
@@ -12,6 +13,7 @@ type BucketLimiter struct {
 	updated time.Time
 }
 
+// NewBucketLimiter returns a new BucketLimiter with the given rate.
 func NewBucketLimiter(rate Rate) Limiter {
 	return &BucketLimiter{
 		rate:    rate,
@@ -20,6 +22,7 @@ func NewBucketLimiter(rate Rate) Limiter {
 	}
 }
 
+// Take returns true as long as the request rate remains within the allowed limit.
 func (l *BucketLimiter) Take() bool {
 	l.mu.Lock()
 	defer l.mu.Unlock()

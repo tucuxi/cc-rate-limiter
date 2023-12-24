@@ -5,18 +5,21 @@ import (
 	"time"
 )
 
+// SlidingWindowLogLimiter is a rate limiter based on the sliding window log algorithm.
 type SlidingWindowLogLimiter struct {
 	mu   sync.Mutex
 	rate Rate
 	log  []int64
 }
 
+// NewSlidingWindowLogLimiter returns a new SlidingWindowLogLimiter with the given rate.
 func NewSlidingWindowLogLimiter(rate Rate) Limiter {
 	return &SlidingWindowLogLimiter{
 		rate: rate,
 	}
 }
 
+// Take returns true as long as the request rate remains within the allowed limit.
 func (l *SlidingWindowLogLimiter) Take() bool {
 	l.mu.Lock()
 	defer l.mu.Unlock()
