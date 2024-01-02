@@ -43,9 +43,11 @@ func (l *SlidingWindowLimiter) Take() bool {
 		l.n = 0
 	}
 
-	l.n++
 	p := 1 - float64(now-w*d)/float64(d)
-	n := l.n + int(math.Round(p*float64(l.np)))
-
-	return n <= l.rate.N
+	n := l.n + 1 + int(math.Round(p*float64(l.np)))
+	take := n <= l.rate.N
+	if take {
+		l.n++
+	}
+	return take
 }
